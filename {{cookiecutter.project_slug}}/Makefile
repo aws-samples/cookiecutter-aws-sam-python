@@ -24,9 +24,9 @@ target:
 	$(info ${HELP_MESSAGE})
 	@exit 0
 
-clean: ##=> Deletes current dev environment and latest build
+clean: ##=> Deletes current build environment and latest build
 	$(info [*] Who needs all that anyway? Destroying environment....)
-	rm -rf ./$(SERVICE)/dev
+	rm -rf ./$(SERVICE)/build
 	rm -rf ./${SERVICE}.zip
 
 all: clean build
@@ -38,13 +38,13 @@ ifeq ($(DOCKER),1)
 	$(info [+] Packaging service '$(SERVICE)' using Docker Lambda -- This may take a while...)
 	docker run -v $$PWD:/var/task -it lambci/lambda:build-python3.6 /bin/bash -c 'make _package SERVICE="${SERVICE}"'
 else
-	$(info [*] Cleaning up local dev/builds before build task...)
+	$(info [*] Cleaning up local builds before build task...)
 	@$(MAKE) clean SERVICE="${SERVICE}"
 	$(info [+] Packaging service '$(SERVICE)' -- This may take a while...)
 	@$(MAKE) _package SERVICE="${SERVICE}"
 endif
 
-build: _check_service_definition _clone_service_to_dev _install_deps ##=> Same as package except that we don't create a ZIP
+build: _check_service_definition _clone_service_to_build _install_deps ##=> Same as package except that we don't create a ZIP
 	@$(MAKE) _install_deps SERVICE="${SERVICE}"
 
 run: ##=> Run SAM Local API GW and can optionally run new containers connected to a defined network
@@ -75,26 +75,26 @@ ifeq ($(wildcard requirements.txt),)
 	$(error [!] Pip requirements file missing from $(BASE) folder...)
 endif
 
-_clone_service_to_dev:
-	$(info [+] Cloning ${SERVICE} directory structure to ${SERVICE}/dev)
-	@rsync -a -f "+ */" -f "- *" -f "- dev/" ${SERVICE}/ ${SERVICE}/dev/
-	$(info [+] Cloning source files from ${SERVICE} to ${SERVICE}/dev)
+_clone_service_to_build:
+	$(info [+] Cloning ${SERVICE} directory structure to ${SERVICE}/build)
+	@rsync -a -f "+ */" -f "- *" -f "- build/" ${SERVICE}/ ${SERVICE}/build/
+	$(info [+] Cloning source files from ${SERVICE} to ${SERVICE}/build)
 	@find ${SERVICE} -type f \
 			-not -name "*.pyc" \
 			-not -name "*__pycache__" \
 			-not -name "requirements.txt" \
 			-not -name "event.json" \
-			-not -name "dev" | cut -d '/' -f2- > .results.txt
+			-not -name "build" | cut -d '/' -f2- > .results.txt
 	@while read line; do \
-		ln -f ${SERVICE}/$$line ${SERVICE}/dev/$$line; \
+		ln -f ${SERVICE}/$$line ${SERVICE}/build/$$line; \
 	done < .results.txt
 	rm -f .results.txt
 
 _check_dev_definition: _check_service_definition
 	$(info [*] Checking whether service $(SERVICE) development build exists...)
 
-ifeq ($(wildcard $(SERVICE)/dev/.),)
-	$(warning [FIX] run 'make build-dev SERVICE=$(SERVICE)' to create one")
+ifeq ($(wildcard $(SERVICE)/build/.),)
+	$(warning [FIX] run 'make build SERVICE=$(SERVICE)' to create one")
 	$(error [!] '$(SERVICE)' doesn't have development build)
 endif
 
@@ -105,16 +105,16 @@ _install_deps:
 	@pipenv run pip install \
 		--isolated \
 		--disable-pip-version-check \
-		-Ur requirements.txt -t ${SERVICE}/dev/
+		-Ur requirements.txt -t ${SERVICE}/build/
 
-# Package application and devs together in expected zip from dev
-_package: _clone_service_to_dev _check_service_definition _install_deps
+# Package application and devs together in expected zip from build
+_package: _clone_service_to_build _check_service_definition _install_deps
 	@$(MAKE) _zip SERVICE="${SERVICE}"
 
-# As its name states: Zip everything up from dev
+# As its name states: Zip everything up from build
 _zip: _check_dev_definition 
 	$(info [+] Creating '$(SERVICE)' ZIP...")
-	@cd ${SERVICE}/dev && zip -rq -9 "$(BASE)/$(SERVICE).zip" * \
+	@cd ${SERVICE}/build && zip -rq -9 "$(BASE)/$(SERVICE).zip" * \
 	--exclude "wheel/*" "setuptools/*" "pkg_resources/*" "pip/*" \
 			  "easy_install.py" "__pycache__/*" "*.dist-info/*" "./**/__pycache__/*"
 	$(info [*] Build complete: $(BASE)/$(SERVICE).zip)
