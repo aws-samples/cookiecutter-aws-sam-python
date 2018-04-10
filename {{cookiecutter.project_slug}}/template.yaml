@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+    {{ cookiecutter.project_name }}
+    
+    {{ cookiecutter.project_short_description }}
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+    Function:
+        Timeout: 5
+{%- if cookiecutter.include_safe_deployment == "y" %}
+        AutoPublishAlias: live # More info about Safe Deployments: https://github.com/awslabs/serverless-application-model/blob/master/docs/safe_lambda_deployments.rst
+        DeploymentPreference:
+            Type: Linear10PercentEvery1Minute {% endif %}
+
+
+Resources:
+
+    FirstFunction:
+        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+        Properties:
+            CodeUri: first_function/build/
+            Handler: app.lambda_handler
+            Runtime: python3.6
+{%- if cookiecutter.include_xray == "y" %}
+            Tracing: Active {% endif %} # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
+{%- if cookiecutter.include_apigw == "y" %}
+            Events:
+                CatchAll:
+                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                    Properties:
+                        Path: /first/{proxy+}
+                        Method: any {% endif %}
+            Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+                Variables:
+                    PARAM1: VALUE
+{%- if cookiecutter.include_xray == "y" %}
+
+    # Sample policy to add additional permissions to your Lambda
+    FirstFunctionAdditionalPermission:
+        Type: "AWS::IAM::Policy"
+        Properties:
+            PolicyName: "root"
+            PolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                    -
+                        Effect: "Allow"
+                        Action: "ssm:GetParameters"
+                        Resource: "*"
+            Roles:
+                -
+                    Ref: !GetAtt FirstFunctionRole.Arn # Sample policy to demonstrate Implicit IAM Role created with SAM
+
+{%- endif %}
+
+Outputs:
+{% if cookiecutter.include_apigw == "y"%}
+    FirstApigwURL:
+      Description: "API Gateway endpoint URL for Prod environment for First Function"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/first/"
+{%- endif %}
+
+    FirstFunction:
+      Description: "First Lambda Function ARN"
+      Value: !GetAtt FirstFunction.Arn
+
