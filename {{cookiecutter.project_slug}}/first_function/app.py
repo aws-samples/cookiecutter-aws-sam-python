@@ -1,5 +1,6 @@
 import boto3
 import json
+import os
 {%- if cookiecutter.include_xray == "y" %}
 from aws_xray_sdk.core import xray_recorder
 
@@ -38,6 +39,7 @@ def my_function():
     if 'AWS_SAM_LOCAL' not in os.environ and 'LAMBDA_TASK_ROOT' in os.environ:
         xray_subsegment = xray_recorder.current_subsegment()
         xray_subsegment.put_annotation("key", "value")
+
     {% endif -%}
 
     return {
