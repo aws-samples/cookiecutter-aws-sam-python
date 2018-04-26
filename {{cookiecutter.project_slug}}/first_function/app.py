@@ -23,20 +23,23 @@ def lambda_handler(event, context):
 {% endif %}
 
 {% if cookiecutter.include_xray == "y" -%}
-# Decorator for sync function
+# Decorator for xray
 @xray_recorder.capture('## my_function_subsegment')
 {% endif -%}
 def my_function():
-{% if cookiecutter.include_xray == "y" -%}
+    {% if cookiecutter.include_xray == "y" -%}
     """
         You can create a sub-segment specifically to a function
         then capture what sub-segment that is inside your code
         and you can add annotations that will be indexed by X-Ray
         for example: put_annotation("operation", "query_db")
     """
-    xray_subsegment = xray_recorder.current_subsegment()
-    xray_subsegment.put_annotation("key", "value")
-{% endif -%}
+    # Only run xray in the AWS Lambda environment
+    if 'AWS_SAM_LOCAL' not in os.environ and 'LAMBDA_TASK_ROOT' in os.environ:
+        xray_subsegment = xray_recorder.current_subsegment()
+        xray_subsegment.put_annotation("key", "value")
+    {% endif -%}
+
     return {
         "hello": "world"
     }

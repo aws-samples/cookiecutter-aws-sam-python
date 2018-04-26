@@ -7,7 +7,7 @@
 #########################################################
 
 BASE := $(shell /bin/pwd)
-CODE_COVERAGE = 95
+CODE_COVERAGE = 68
 
 ################# 
 #  Python vars	#
