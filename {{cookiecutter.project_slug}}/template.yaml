@@ -59,7 +59,7 @@ Outputs:
 {% if cookiecutter.include_apigw == "y"%}
     FirstApigwURL:
       Description: "API Gateway endpoint URL for Prod environment for First Function"
-      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/first/"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/first/proxy"
 {%- endif %}
 
     FirstFunction:
