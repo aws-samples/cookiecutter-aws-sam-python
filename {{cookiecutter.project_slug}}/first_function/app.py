@@ -1,6 +1,14 @@
 import boto3
 import json
 import os
+
+
+def runs_on_aws_lambda():
+    """
+        Returns True if this function is executed on AWS Lambda service.
+    """
+    return 'AWS_SAM_LOCAL' not in os.environ and 'LAMBDA_TASK_ROOT' in os.environ
+
 {%- if cookiecutter.include_xray == "y" %}
 from aws_xray_sdk.core import xray_recorder
 
@@ -11,12 +19,6 @@ if runs_on_aws_lambda():
 {%- endif %}
 
 session = boto3.Session()
-
-def runs_on_aws_lambda():
-    """
-        Returns True if this function is executed on AWS Lambda service.
-    """
-    return 'AWS_SAM_LOCAL' not in os.environ and 'LAMBDA_TASK_ROOT' in os.environ
 
 
 def lambda_handler(event, context):
@@ -54,6 +56,4 @@ def get_message():
         xray_subsegment.put_annotation("key", "value")
     {% endif -%}
 
-    return {
-        "hello": "world"
-    }
+    return { "hello": "world" }
