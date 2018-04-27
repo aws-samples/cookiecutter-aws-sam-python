@@ -7,7 +7,7 @@
 * AWS CLI already configured with at least PowerUser permission
 * [Python 3 installed](https://www.python.org/downloads/)
 * [Pipenv installed](https://github.com/pypa/pipenv)
-    - `pip install pipenv`
+  * `pip install pipenv`
 * [Docker installed](https://www.docker.com/community-edition)
 * [SAM Local installed](https://github.com/awslabs/aws-sam-local) 
 
@@ -74,7 +74,6 @@ If the previous command run successfully you should now be able to hit the follo
 
 ## Deployment
 
-
 First and foremost, we need a S3 bucket where we can upload our Lambda functions packaged as ZIP before we deploy anything - If you don't have a S3 bucket to store code artifacts then this is a good time to create one:
 
 ```bash
@@ -111,9 +110,11 @@ aws cloudformation describe-stacks \
 ``` 
 {% endif %}
 
-# Appendix
+## Appendix
+
 {% if cookiecutter.include_experimental_make == "y" %}
-## Makefile
+
+### Makefile
 
 It is important that the Makefile created only works on OSX/Linux but the tasks above can easily be turned into a Powershell or any scripting language you may want too.
 
@@ -121,16 +122,17 @@ The following make targets will automate that we went through above:
 
 * Find all available targets: `make`
 * Install all deps and clone (OS hard link) our lambda function to `/build`: `make build SERVICE="first_function"`
-    - `SERVICE="first_function"` tells Make to start the building process from there
-    - By creating a hard link we no longer need to keep copying our app over to Build and keeps it tidy and clean
+  * `SERVICE="first_function"` tells Make to start the building process from there
+  * By creating a hard link we no longer need to keep copying our app over to Build and keeps it tidy and clean
 * Run `Pytest` against all tests found under `tests` folder: `make test`
 * Install all deps and builds a ZIP file ready to be deployed: `make package SERVICE="first_function"`
-    - You can also build deps and a ZIP file within a Docker Lambda container: `make package SERVICE="first_function" DOCKER=1`
-    - This is particularly useful when using C-extensions that if built on your OS may not work when deployed to Lambda (different OS)
+  * You can also build deps and a ZIP file within a Docker Lambda container: `make package SERVICE="first_function" DOCKER=1`
+  * This is particularly useful when using C-extensions that if built on your OS may not work when deployed to Lambda (different OS)
+* Package and deploy your application to AWS CloudFormation: `make deploy BUCKET="my_s3_bucket_name"`
 
 {% endif %}
 
-## AWS CLI commands
+### AWS CLI commands
 
 AWS CLI commands to package, deploy and describe outputs defined within the cloudformation stack:
 

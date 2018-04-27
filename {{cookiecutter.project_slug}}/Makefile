@@ -6,6 +6,8 @@
 #														#
 #########################################################
 
+NAME = {{ cookiecutter.project_slug }}
+CAPABILITIES = CAPABILITY_IAM 
 BASE := $(shell /bin/pwd)
 
 ################# 
@@ -44,6 +46,10 @@ else
 	@$(MAKE) _package SERVICE="${SERVICE}"
 endif
 
+deploy: _check_deploy
+	$(info [*] Package and deploy the template and upload artifacts to S3...)
+	@$(MAKE) _deploy BUCKET="${BUCKET}"
+	
 build: _check_service_definition _clone_service_to_build ##=> Same as package except that we don't create a ZIP
 	@$(MAKE) _install_deps SERVICE="${SERVICE}"
 
@@ -58,6 +64,28 @@ test: ##=> Run pytest
 ############# 
 #  Helpers	#
 ############# 
+
+_check_deploy:
+ifeq ($(wildcard template.yaml),)
+	$(error [!] template.yaml file missing from $(BASE) folder...)
+endif
+
+ifndef BUCKET
+	$(error [!] BUCKET env not defined...FAIL)
+endif
+
+_deploy:
+	@rm -rf ./packaged.yaml
+	$(info [+] Package template.yaml to packaged.yaml and upload the artifacts to $(BUCKET) with $(CAPABILITIES))
+	@aws cloudformation package \
+		--template-file template.yaml \
+		--output-template-file packaged.yaml \
+		--s3-bucket ${BUCKET}
+	$(info [+] Deploy packaged.yaml -- This may take a while...)
+	@aws cloudformation deploy \
+		--template-file packaged.yaml \
+		--stack-name $(NAME) \
+		--capabilities $(CAPABILITIES)
 
 _check_service_definition:
 	$(info [*] Checking whether service $(SERVICE) exists...)
@@ -139,14 +167,17 @@ define HELP_MESSAGE
 	...::: Cleans up the environment - Deletes Virtualenv, ZIP builds and Dev env :::...
 	$ make clean SERVICE="slack"
 
-	...::: Creates local dev environment for Python hot-reloading w/ packages:::...
+	...::: Creates local dev environment for Python hot-reloading w/ packages :::...
 	$ make build SERVICE="first_function"
 
 	...::: Bundles app and dependencies into a ZIP file :::...
-	$ make package SERVICE="email"
+	$ make package SERVICE="first_function"
 
-	...::: Bundles app and dependencies into a ZIP file using Docker:::...
-	$ make package SERVICE="email" DOCKER=1
+	...::: Bundles app and dependencies into a ZIP file using Docker :::...
+	$ make package SERVICE="first_function" DOCKER=1
+
+	...::: Deploy app to AWS CloudFormation :::...
+	$ make deploy BUCKET="my_s3_bucket_name"
 
 	...::: Run SAM Local API Gateway :::...
 	$ make run
