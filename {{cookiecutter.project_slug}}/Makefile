@@ -46,9 +46,9 @@ else
 	@$(MAKE) _package SERVICE="${SERVICE}"
 endif
 
-deploy: _check_deploy
+deploy: _check_deploy_template
 	$(info [*] Package and deploy the template and upload artifacts to S3...)
-	@$(MAKE) _deploy BUCKET="${BUCKET}"
+	@$(MAKE) _deploy_template BUCKET="${BUCKET}"
 	
 build: _check_service_definition _clone_service_to_build ##=> Same as package except that we don't create a ZIP
 	@$(MAKE) _install_deps SERVICE="${SERVICE}"
@@ -65,28 +65,35 @@ test: ##=> Run pytest
 #  Helpers	#
 ############# 
 
-_check_deploy:
+_check_deploy_template:
 ifeq ($(wildcard template.yaml),)
 	$(error [!] template.yaml file missing from $(BASE) folder...)
+endif
+
+ifneq ($(shell sam validate --template template.yaml > /dev/null 2>&1; echo $$?), 0)
+	$(error [!] template.yaml has an invalid yaml format)
 endif
 
 ifndef BUCKET
 	$(error [!] BUCKET env not defined...FAIL)
 endif
 
-_deploy:
-	@rm -rf ./packaged.yaml
+_package_template:
 	$(info [+] Package template.yaml to packaged.yaml and upload the artifacts to $(BUCKET) with $(CAPABILITIES))
 	@aws cloudformation package \
 		--template-file template.yaml \
 		--output-template-file packaged.yaml \
-		--s3-bucket ${BUCKET}
+		--s3-bucket ${BUCKET} > /dev/null 2>&1
+
+_deploy_template: _package_template
 	$(info [+] Deploy packaged.yaml -- This may take a while...)
 	@aws cloudformation deploy \
+		--no-fail-on-empty-changeset \
 		--template-file packaged.yaml \
 		--stack-name $(NAME) \
-		--capabilities $(CAPABILITIES)
-
+		--capabilities $(CAPABILITIES) \
+		; test "$$?" -eq 0 && echo '[+] Template has been deployed' || $$(echo '[!] Deployment of the template failed' && exit 1)
+	
 _check_service_definition:
 	$(info [*] Checking whether service $(SERVICE) exists...)
 
