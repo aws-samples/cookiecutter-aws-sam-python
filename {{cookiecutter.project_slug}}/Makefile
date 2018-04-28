@@ -9,6 +9,7 @@
 NAME = {{ cookiecutter.project_slug }}
 CAPABILITIES = CAPABILITY_IAM 
 BASE := $(shell /bin/pwd)
+CODE_COVERAGE = 72
 
 ################# 
 #  Python vars	#
@@ -59,7 +60,7 @@ run: ##=> Run SAM Local API GW and can optionally run new containers connected t
 		|| sam local start-api --docker-network ${NETWORK}
 
 test: ##=> Run pytest
-	@pipenv run python -m pytest tests/ -v
+	@AWS_XRAY_CONTEXT_MISSING=LOG_ERROR pipenv run python -m pytest --cov . --cov-report term-missing --cov-fail-under $(CODE_COVERAGE) tests/ -v
 
 ############# 
 #  Helpers	#
