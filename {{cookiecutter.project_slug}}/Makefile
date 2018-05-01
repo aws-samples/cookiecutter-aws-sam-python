@@ -32,6 +32,11 @@ clean: ##=> Deletes current build environment and latest build
 
 all: clean build
 
+install: _install_packages _install_dev_packages
+
+shell: 
+	@pipenv shell
+	
 package: _check_service_definition ##=> Builds package using Docker Lambda container
 ifeq ($(DOCKER),1)
 	$(info [*] Cleaning up local dev/builds before build task...)
@@ -57,8 +62,16 @@ test: ##=> Run pytest
 	@AWS_XRAY_CONTEXT_MISSING=LOG_ERROR pipenv run python -m pytest --cov . --cov-report term-missing --cov-fail-under $(CODE_COVERAGE) tests/ -v
 
 ############# 
-#  Helpers	#
+#  Helpers  #
 ############# 
+
+_install_packages:
+	$(info [*] Install required packages...)
+	@pipenv install
+
+_install_dev_packages:
+	$(info [*] Install required dev-packages...)
+	@pipenv install -d
 
 _check_service_definition:
 	$(info [*] Checking whether service $(SERVICE) exists...)
@@ -136,6 +149,12 @@ define HELP_MESSAGE
 		Info: Environment variable to declare whether Docker should be used to build (great for C-deps)
 
 	Common usage:
+
+	...::: Installs all required packages as defined in the pipfile :::...
+	$ make install
+
+	...::: Spawn a virtual environment shell :::...
+	$ make shell
 
 	...::: Cleans up the environment - Deletes Virtualenv, ZIP builds and Dev env :::...
 	$ make clean SERVICE="slack"
