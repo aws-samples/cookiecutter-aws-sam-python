@@ -27,17 +27,17 @@ def remove_optional_files():
 
 def main():
 
-    project_slug = '{{ cookiecutter.project_slug }}'
+    project_name = '{{ cookiecutter.project_name }}'
     makefile_choice = '{{ cookiecutter.include_experimental_make }}'.lower()
     if makefile_choice == 'n':
         remove_optional_files()
 
     print(SUCCESS +
           "Project initialized successfully! You can now jump to {} folder".
-          format(project_slug) + TERMINATOR)
+          format(project_name) + TERMINATOR)
     print(INFO +
           "{}/README.md contains instructions on how to proceed.".
-          format(project_slug) + TERMINATOR)
+          format(project_name) + TERMINATOR)
 
 
 if __name__ == '__main__':
