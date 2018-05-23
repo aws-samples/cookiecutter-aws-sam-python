@@ -1,6 +1,5 @@
 {
     "project_name": "Name of the project",
-    "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-') }}",
     "project_short_description": "A short description of the project",
     "include_apigw": "y",
     "include_xray": "y",
