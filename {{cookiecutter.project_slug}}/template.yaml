@@ -35,7 +35,6 @@ Resources:
             Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
                 Variables:
                     PARAM1: VALUE
-{%- if cookiecutter.include_xray == "y" %}
 
     # Sample policy to add additional permissions to your Lambda
     FirstFunctionAdditionalPermission:
@@ -50,10 +49,7 @@ Resources:
                         Action: "ssm:GetParameters"
                         Resource: "*"
             Roles:
-                -
-                    Ref: !GetAtt FirstFunctionRole.Arn # Sample policy to demonstrate Implicit IAM Role created with SAM
-
-{%- endif %}
+                - !Ref FirstFunctionRole # Sample policy to demonstrate Implicit IAM Role created with SAM
 
 Outputs:
 {% if cookiecutter.include_apigw == "y"%}
