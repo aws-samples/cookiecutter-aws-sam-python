@@ -2,7 +2,7 @@ import json
 import pytest
 from first_function import app
 
-
+{% if cookiecutter.include_apigw == "y" %}
 @pytest.fixture()
 def apigw_event():
     """ Generates API GW Event"""
@@ -83,14 +83,13 @@ def apigw_event():
         "path": "/examplepath"
     }
 
-
 def test_lambda_handler(apigw_event):
-
     ret = app.lambda_handler(apigw_event, "")
-
-{% if cookiecutter.include_apigw == "y" %}
     assert ret['statusCode'] == 200
     assert ret['body'] == json.dumps({'hello': 'world'})
+
 {% else %}
+def test_lambda_handler():
+    ret = app.lambda_handler({}, "")
     assert ret == {'hello': 'world'}
 {% endif %}
