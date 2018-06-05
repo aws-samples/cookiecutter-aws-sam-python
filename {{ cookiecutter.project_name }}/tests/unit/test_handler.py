@@ -89,7 +89,14 @@ def test_lambda_handler(apigw_event):
     assert ret['body'] == json.dumps({'hello': 'world'})
 
 {% else %}
-def test_lambda_handler():
-    ret = app.lambda_handler({}, "")
+
+@pytest.fixture()
+def lambda_event():
+    """ Generates Lambda Event"""
+
+    return { "test": "body" }
+
+def test_lambda_handler(lambda_event):
+    ret = app.lambda_handler(lambda_event, "")
     assert ret == {'hello': 'world'}
 {% endif %}
