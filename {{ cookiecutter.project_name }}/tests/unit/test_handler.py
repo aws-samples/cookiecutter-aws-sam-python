@@ -88,5 +88,9 @@ def test_lambda_handler(apigw_event):
 
     ret = app.lambda_handler(apigw_event, "")
 
+{% if cookiecutter.include_apigw == "y" %}
     assert ret['statusCode'] == 200
     assert ret['body'] == json.dumps({'hello': 'world'})
+{% else %}
+    assert ret == {'hello': 'world'}
+{% endif %}
