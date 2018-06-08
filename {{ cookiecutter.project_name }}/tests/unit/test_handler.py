@@ -94,7 +94,7 @@ def test_lambda_handler(apigw_event):
 def lambda_event():
     """ Generates Lambda Event"""
 
-    return { "test": "body" }
+    return { "foo": "bar" }
 
 def test_lambda_handler(lambda_event):
     ret = app.lambda_handler(lambda_event, "")
