@@ -14,7 +14,7 @@ from aws_xray_sdk.core import xray_recorder
 
 # Patch all supported libraries for X-Ray - More info: https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-python-patching.html
 if runs_on_aws_lambda():
-    from aws_xray_sdk.core import patch_all 
+    from aws_xray_sdk.core import patch_all
     patch_all()
 {%- endif %}
 
@@ -24,8 +24,10 @@ session = boto3.Session()
 def lambda_handler(event, context):
     """
         AWS Lambda handler
+        {% if cookiecutter.include_apigw == "y" %}
 
         This method is invoked by the API Gateway: /Prod/first/{proxy+} endpoint.
+        {% endif %}
     """
     message = get_message()
 
