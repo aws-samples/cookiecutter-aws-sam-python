@@ -27,8 +27,9 @@ target:
 
 clean: ##=> Deletes current build environment and latest build
 	$(info [*] Who needs all that anyway? Destroying environment....)
-	rm -rf ./$(SERVICE)/build
+	rm -rf ./${SERVICE}/build
 	rm -rf ./${SERVICE}.zip
+	find . -type d -name '*pycache*' -exec rm -rf {} \;
 
 all: clean build
 
@@ -67,11 +68,13 @@ test: ##=> Run pytest
 
 _install_packages:
 	$(info [*] Install required packages...)
-	@pipenv install
+	@pipenv shell \
+	&& @pipenv install
 
 _install_dev_packages:
 	$(info [*] Install required dev-packages...)
-	@pipenv install -d
+	@pipenv shell \
+	&& @pipenv install -d
 
 _check_service_definition:
 	$(info [*] Checking whether service $(SERVICE) exists...)
@@ -85,8 +88,8 @@ ifeq ($(wildcard $(SERVICE)/.),)
 	$(error [!] '$(SERVICE)' folder doesn't exist)
 endif
 
-ifeq ($(wildcard requirements.txt),)
-	$(error [!] Pip requirements file missing from $(BASE) folder...)
+ifeq ($(wildcard Pipfile),)
+	$(error [!] Pipfile dependencies file missing from $(BASE) folder...)
 endif
 
 _clone_service_to_build:
@@ -124,6 +127,7 @@ _install_deps:
 		--isolated \
 		--disable-pip-version-check \
 		-Ur requirements.txt -t ${SERVICE}/build/
+	@rm -f requirements.txt
 
 # Package application and devs together in expected zip from build
 _package: _clone_service_to_build _check_service_definition _install_deps
