@@ -26,6 +26,11 @@ As you've chosen the experimental Makefile we can use Make to automate Packaging
 
         ...::: Run SAM Local API Gateway :::...
         make run
+
+        # or
+
+        ...::: Run SAM Invoke Function :::...
+        make invoke SERVICE="FirstFunction" EVENT="events/first_function_event.json"
 ```
 {% else %}
 Provided that you have requirements above installed, proceed by installing the application dependencies and development dependencies:
