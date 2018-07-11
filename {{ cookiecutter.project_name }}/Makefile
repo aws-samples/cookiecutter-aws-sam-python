@@ -94,6 +94,10 @@ endif
 
 _clone_service_to_build:
 ifeq ($(wildcard $(SERVICE)/build/.),)
+	$(info [+] Setting permissions for files under ${SERVICE}/)
+	find ${SERVICE}/ -type f -exec chmod go+r {} \;
+	$(info [+] Setting permissions for directories under ${SERVICE}/)
+	find ${SERVICE}/ -type d -exec chmod go+rx {} \;
 	$(info [+] Cloning ${SERVICE} directory structure to ${SERVICE}/build)
 	rsync -a -f "+ */" -f "- *" ${SERVICE}/ ${SERVICE}/build/
 	$(info [+] Cloning source files from ${SERVICE} to ${SERVICE}/build)
