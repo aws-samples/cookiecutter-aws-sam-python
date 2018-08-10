@@ -8,6 +8,7 @@
 
 BASE := $(shell /bin/pwd)
 CODE_COVERAGE = 72
+PIPENV ?= pipenv --python 3.6
 
 ################# 
 #  Python vars	#
@@ -36,7 +37,7 @@ all: clean build
 install: _install_packages _install_dev_packages
 
 shell: 
-	@pipenv shell
+	@$(PIPENV) shell
 	
 package: _check_service_definition ##=> Builds package using Docker Lambda container
 ifeq ($(DOCKER),1)
@@ -60,7 +61,7 @@ run: ##=> Run SAM Local API GW and can optionally run new containers connected t
 		|| sam local start-api --docker-network ${NETWORK}
 
 test: ##=> Run pytest
-	@AWS_XRAY_CONTEXT_MISSING=LOG_ERROR pipenv run python -m pytest --cov . --cov-report term-missing --cov-fail-under $(CODE_COVERAGE) tests/ -v
+	@AWS_XRAY_CONTEXT_MISSING=LOG_ERROR $(PIPENV) run python -m pytest --cov . --cov-report term-missing --cov-fail-under $(CODE_COVERAGE) tests/ -v
 
 ############# 
 #  Helpers  #
@@ -68,13 +69,13 @@ test: ##=> Run pytest
 
 _install_packages:
 	$(info [*] Install required packages...)
-	@pipenv shell \
-	&& @pipenv install
+	@$(PIPENV) shell \
+	&& @$(PIPENV) install
 
 _install_dev_packages:
 	$(info [*] Install required dev-packages...)
-	@pipenv shell \
-	&& @pipenv install -d
+	@$(PIPENV) shell \
+	&& @$(PIPENV) install -d
 
 _check_service_definition:
 	$(info [*] Checking whether service $(SERVICE) exists...)
@@ -126,8 +127,8 @@ endif
 _install_deps:
 	$(info [+] Installing '$(SERVICE)' dependencies...")	
 	@pip install pipenv
-	@pipenv lock -r > requirements.txt
-	@pipenv run pip install \
+	@$(PIPENV) lock -r > requirements.txt
+	@$(PIPENV) run pip install \
 		--isolated \
 		--disable-pip-version-check \
 		-Ur requirements.txt -t ${SERVICE}/build/
