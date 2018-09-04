@@ -30,7 +30,6 @@ clean: ##=> Deletes current build environment and latest build
 	$(info [*] Who needs all that anyway? Destroying environment....)
 	rm -rf ./${SERVICE}/build
 	rm -rf ./${SERVICE}.zip
-	find . -type d -name '*pycache*' -exec rm -rf {} \;
 
 all: clean build
 
