@@ -32,6 +32,14 @@ Resources:
                     Properties:
                         Path: /first/{proxy+}
                         Method: any {% endif %}
+            # Policies: # Example inline policy
+            #     - Version: "2012-10-17"
+            #     Statement:
+            #         - Effect: "Allow"
+            #         Action:
+            #             - "ssm:GetParameter"
+            #         Resource:
+            #             - "*"
             Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
                 Variables:
                     PARAM1: VALUE
