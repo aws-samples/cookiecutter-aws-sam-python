@@ -8,7 +8,7 @@
 
 BASE := $(shell /bin/pwd)
 CODE_COVERAGE = 72
-PIPENV ?= pipenv --python 3.6
+PIPENV ?= pipenv
 
 ################# 
 #  Python vars	#
