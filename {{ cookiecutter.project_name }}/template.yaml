@@ -30,7 +30,7 @@ Resources:
                 CatchAll:
                     Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
                     Properties:
-                        Path: /first/{proxy+}
+                        Path: /first/{any_argument+}
                         Method: any {% endif %}
             # Policies: # Example inline policy
             #     - Version: "2012-10-17"
