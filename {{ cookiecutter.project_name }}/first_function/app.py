@@ -2,21 +2,16 @@ import boto3
 import json
 import os
 
-
-def runs_on_aws_lambda():
-    """
-        Returns True if this function is executed on AWS Lambda service.
-    """
-    return 'AWS_SAM_LOCAL' not in os.environ and 'LAMBDA_TASK_ROOT' in os.environ
-
 {%- if cookiecutter.include_xray == "y" %}
-# Patch all supported libraries for X-Ray - More info: https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-python-patching.html
-if runs_on_aws_lambda():
-    from aws_xray_sdk.core import xray_recorder    
-    from aws_xray_sdk.core import patch_all
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.core import patch_all  # Patch all supported libraries for X-Ray - More info: https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-python-patching.html
+
+# Only instrument libraries if not running locally
+if "AWS_SAM_LOCAL" not in os.environ:
     patch_all()
 {%- endif %}
 
+# Global variables are reused across execution contexts (if available)
 session = boto3.Session()
 
 
@@ -90,6 +85,7 @@ def lambda_handler(event, context):
             https: // docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
         {% endif %}
     """
+
     message = get_message()
 {% if cookiecutter.include_apigw == "y" %}
     return {
@@ -101,8 +97,8 @@ def lambda_handler(event, context):
 {% endif %}
 
 {% if cookiecutter.include_xray == "y" -%}
-# Decorator for xray
-@xray_recorder.capture('## get_message_segment')
+# For simple subsegments that don't need annotation/metadata you can use the decorated version
+## @xray_recorder.capture('## get_message_subsegment')
 {% endif -%}
 def get_message():
     {% if cookiecutter.include_xray == "y" -%}
@@ -113,12 +109,13 @@ def get_message():
         for example: put_annotation("operation", "query_db")
     """
     # Only run xray in the AWS Lambda environment
-    if runs_on_aws_lambda():
+    if "AWS_SAM_LOCAL" not in os.environ:
         xray_subsegment = xray_recorder.current_subsegment()
-        xray_subsegment.put_annotation("key", "value")
-        # Sample metadata
+        xray_subsegment.put_annotation("method", "get_message") # indexed key/value data that X-Ray can use to sort traces by
+        
+        # Sample metadata - Same as annotation but non-indexed data + allows for objects/dicts
         # subsegment.put_metadata("operation", "metadata", "python object/json")
         xray_recorder.end_subsegment()
     {% endif -%}
 
-    return { "hello": "world" }
+    return {"hello": "world"}
