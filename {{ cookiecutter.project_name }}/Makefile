@@ -1,8 +1,7 @@
-{% if cookiecutter.include_experimental_make == "y" %}
 
 #########################################################
 #														#
-# EXPERIMENTAL - Only use if you know what you're doing #
+# SAMPLE - Makefile to abstract common tasks	 		#
 #														#
 #########################################################
 
@@ -187,5 +186,3 @@ define HELP_MESSAGE
 	...::: Run SAM Local API Gateway within a Docker Network :::...
 	$ make run NETWORK="sam-network"
 endef
-
-{% endif %}
