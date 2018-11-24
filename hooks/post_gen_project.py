@@ -12,9 +12,24 @@ SUCCESS = "\x1b[1;32m [SUCCESS]: "
 HINT = "\x1b[3;33m"
 
 
+def remove_optional_files():
+    filenames = ["event.json"]
+    for file in filenames:
+        if os.path.isfile(file):
+            print(INFO + "Removing {} from project due to chosen options...".
+                  format(file) + TERMINATOR)
+            os.remove(file)
+
+    return True
+
+
 def main():
 
     project_name = '{{ cookiecutter.project_name }}'
+    apigw_choice = '{{ cookiecutter.include_apigw }}'.lower()
+
+    if apigw_choice == 'n':
+        remove_optional_files()
 
     print(SUCCESS +
           "Project initialized successfully! You can now jump to {} folder".
