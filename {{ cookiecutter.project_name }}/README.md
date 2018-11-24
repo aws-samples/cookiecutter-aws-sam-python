@@ -11,6 +11,8 @@
 * [Docker installed](https://www.docker.com/community-edition)
 * [SAM Local installed](https://github.com/awslabs/aws-sam-local)
 
+> **NOTE for Windows users**: If you don't have WSL or Make installed, alternative commands to Make are provided in Appendix/Makefile section.
+
 ### Local development
 
 Provided that you have requirements above installed, proceed by building the sample Lambda function:
@@ -19,15 +21,12 @@ Provided that you have requirements above installed, proceed by building the sam
 make build
 ```
 
-[**If you don't have Make**] Run the following command: ``sam build``
 {% if cookiecutter.include_apigw == "y" %}
 **Invoking function locally through local API Gateway**
 
 ```bash
 make run
 ```
-
-[**If you don't have Make**] Run the following command: ``sam local start-api`
 
 If the previous command run successfully you should now be able to hit the following local endpoint to invoke your function `http://localhost:3000/first/REPLACE-ME-WITH-ANYTHING`.
 {% else %}
@@ -40,18 +39,17 @@ sam local invoke FirstFunction -e event.json
 
 ## Testing
 
-`Pytest` is used to discover tests created under `tests` folder - Here's how you can run tests our initial unit tests:
+`Pytest` is used to discover tests created under `tests` folder. If you don't have `Pytest` and `Coverage plugin` for Pytest within your Python environment you need to install them before running the test runner:
+
+```bash
+make install
+```
+
+With development dependencies installed, run our initial unit tests via Pytest runner:
 
 ```bash
 make test
 ```
-
-**If you don't have Make** you can run the following command:
-
-```bash
-AWS_XRAY_CONTEXT_MISSING=LOG_ERROR pipenv run python -m pytest tests/ -v
-```
-
 
 ## Packaging and Deployment
 
@@ -114,9 +112,14 @@ The sample Makefile provided only works on OSX/Linux but the tasks above can eas
 The following make targets will automate that we went through above:
 
 * Find all available targets: **`make`**
+* Install Pytest and Pytest plugins: **``make install``**
+    - **[Alternative command]**: ``pip install -r requirements-dev.txt``
 * Build all Lambda functions available in `template.yaml`: **`make build`**
+    - **[Alternative command]**: ``sam build``
 * Run `Pytest` against all tests found under `tests` folder: **`make test`**
+    - **[Alternative command]**: ``AWS_XRAY_CONTEXT_MISSING=LOG_ERROR pipenv run python -m pytest tests/ -v``
 * For native dependencies that rely on C bindings you can build within an Amazon Linux Docker container: `make build DOCKER=1`
+    - **[Alternative command]**: ``sam build --use-container``
 
 ## CLI commands
 
