@@ -6,10 +6,8 @@
 
 * AWS CLI with Administrator permission
 * [Python 3 installed](https://www.python.org/downloads/)
-* [Pipenv installed](https://github.com/pypa/pipenv)
-    - `pip install pipenv`
 * [Docker installed](https://www.docker.com/community-edition)
-* [SAM Local installed](https://github.com/awslabs/aws-sam-local)
+* [SAM CLI installed](https://github.com/awslabs/aws-sam-cli/)
 
 > **NOTE for Windows users**: If you don't have WSL or Make installed, alternative commands to Make are provided in Appendix/Makefile section.
 
