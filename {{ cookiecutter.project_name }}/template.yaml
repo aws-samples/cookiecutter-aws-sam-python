@@ -20,7 +20,7 @@ Resources:
     FirstFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
         Properties:
-            CodeUri: first_function/build/
+            CodeUri: first_function
             Handler: app.lambda_handler
             Runtime: python3.6
 {%- if cookiecutter.include_xray == "y" %}
@@ -40,15 +40,15 @@ Resources:
             #             - "ssm:GetParameter"
             #         Resource:
             #             - "*"
-            Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
-                Variables:
-                    PARAM1: VALUE
+            # Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+            #     Variables:
+            #         PARAM1: VALUE
 
-    # Sample policy to add additional permissions to your Lambda
+    # Adds IAM Policy to Lambda function IAM Role that is generated implicitly
     FirstFunctionAdditionalPermission:
         Type: "AWS::IAM::Policy"
         Properties:
-            PolicyName: "root"
+            PolicyName: "ParameterStoreSample"
             PolicyDocument:
                 Version: "2012-10-17"
                 Statement:
@@ -63,7 +63,7 @@ Outputs:
 {% if cookiecutter.include_apigw == "y"%}
     FirstApigwURL:
       Description: "API Gateway endpoint URL for Prod environment for First Function"
-      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/first/proxy"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/first/argument"
 {%- endif %}
 
     FirstFunction:
