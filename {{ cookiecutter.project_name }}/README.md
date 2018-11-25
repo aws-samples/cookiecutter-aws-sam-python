@@ -7,7 +7,7 @@
 * AWS CLI with Administrator permission
 * [Python 3 installed](https://www.python.org/downloads/)
 * [Docker installed](https://www.docker.com/community-edition)
-* [SAM CLI installed](https://github.com/awslabs/aws-sam-cli/)
+* [SAM CLI installed](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
 
 > **NOTE for Windows users**: If you don't have WSL or Make installed, alternative commands to Make are provided in Appendix/Makefile section.
 
