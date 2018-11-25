@@ -29,11 +29,17 @@ make run
 ```
 
 If the previous command run successfully you should now be able to hit the following local endpoint to invoke your function `http://localhost:3000/first/REPLACE-ME-WITH-ANYTHING`.
+
+**Invoking function locally by passing event as a file**
+
+```bash
+sam local invoke FirstFunction -e event.json
+```
 {% else %}
 **Invoking function locally**
 
 ```bash
-sam local invoke FirstFunction -e event.json
+echo '{"message": "Hello" }' | sam local invoke FirstFunction
 ```
 {% endif %}
 
