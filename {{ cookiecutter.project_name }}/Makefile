@@ -25,7 +25,7 @@ all: clean build
 
 install: _install_dev_packages
 
-build: _check_service_definition _clone_service_to_build ##=> Generates build artifacts for local development/deployment
+build: ##=> Generates build artifacts for local development/deployment
 ifeq ($(DOCKER),1)
 	$(info [+] Building all functions available in template.yaml using Docker Lambda -- This may take a while...)
 	sam build --use-container
