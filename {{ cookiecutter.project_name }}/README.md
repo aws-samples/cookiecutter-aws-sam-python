@@ -118,7 +118,7 @@ The following make targets will automate that we went through above:
     - **[Alternative command]**: ``sam build``
 * Run `Pytest` against all tests found under `tests` folder: **`make test`**
     - **[Alternative command]**: ``AWS_XRAY_CONTEXT_MISSING=LOG_ERROR pipenv run python -m pytest tests/ -v``
-* For native dependencies that rely on C bindings you can build within an Amazon Linux Docker container: `make build DOCKER=1`
+* Build all Lambda functions available in `template.yaml` within Amazon Linux container (useful for Native dependencies/C-bindings) : **`make build DOCKER=1`**
     - **[Alternative command]**: ``sam build --use-container``
 
 ## CLI commands
