@@ -12,8 +12,10 @@ Globals:
 {%- if cookiecutter.include_safe_deployment == "y" %}
         AutoPublishAlias: live # More info about Safe Deployments: https://github.com/awslabs/serverless-application-model/blob/master/docs/safe_lambda_deployments.rst
         DeploymentPreference:
-            Type: Linear10PercentEvery1Minute {% endif %}
-
+            Type: Linear10PercentEvery1Minute 
+            Alarms:
+                # Rollback deployment if any of the following CloudWatch alarms breach 
+                - !Ref LiveAliasErrorMetricGreaterThanZeroAlarm  {% endif %}
 
 Resources:
 
@@ -43,21 +45,40 @@ Resources:
             # Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
             #     Variables:
             #         PARAM1: VALUE
+{% if cookiecutter.include_safe_deployment == "y" %}
+    LiveAliasErrorMetricGreaterThanZeroAlarm:
+        Type: "AWS::CloudWatch::Alarm"
+        Properties:
+            AlarmDescription: Lambda Function Error > 0
+            ComparisonOperator: GreaterThanThreshold
+            Dimensions:
+                - Name: Resource
+                  Value: !Sub "${FirstFunction}:live"
+                - Name: FunctionName
+                  Value: !Ref FirstFunction
+            EvaluationPeriods: 1
+            MetricName: Errors
+            Namespace: AWS/Lambda
+            Period: 60
+            Statistic: Sum
+            Threshold: 0
+            TreatMissingData: notBreaching
+{%- endif %}
 
     # Adds IAM Policy to Lambda function IAM Role that is generated implicitly
-    FirstFunctionAdditionalPermission:
-        Type: "AWS::IAM::Policy"
-        Properties:
-            PolicyName: "ParameterStoreSample"
-            PolicyDocument:
-                Version: "2012-10-17"
-                Statement:
-                    -
-                        Effect: "Allow"
-                        Action: "ssm:GetParameters"
-                        Resource: "*"
-            Roles:
-                - !Ref FirstFunctionRole # Sample policy to demonstrate Implicit IAM Role created with SAM
+    # FirstFunctionAdditionalPermission:
+    #     Type: "AWS::IAM::Policy"
+    #     Properties:
+    #         PolicyName: "ParameterStoreSample"
+    #         PolicyDocument:
+    #             Version: "2012-10-17"
+    #             Statement:
+    #                 -
+    #                     Effect: "Allow"
+    #                     Action: "ssm:GetParameters"
+    #                     Resource: "*"
+    #         Roles:
+    #             - !Ref FirstFunctionRole # Sample policy to demonstrate Implicit IAM Role created with SAM
 
 Outputs:
 {% if cookiecutter.include_apigw == "y"%}
