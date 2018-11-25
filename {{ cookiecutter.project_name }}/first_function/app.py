@@ -6,15 +6,27 @@ import os
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all  # Patch all supported libraries for X-Ray - More info: https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-python-patching.html
 
-# Only instrument libraries if not running locally
-if "AWS_SAM_LOCAL" not in os.environ:
+
+def has_xray_daemon():
+    """
+        X-Ray Daemon isn't integrated with SAM CLI yet
+        therefore we should selectively trace only if running on Lambda runtime
+
+        Return: boolean
+    """
+    return 'AWS_SAM_LOCAL' not in os.environ and 'LAMBDA_TASK_ROOT' in os.environ
+
+if has_xray_daemon():
     patch_all()
 {%- endif %}
 
 # Global variables are reused across execution contexts (if available)
 session = boto3.Session()
 
-
+{% if cookiecutter.include_xray == "y" -%}
+# For simple subsegments that don't need annotation/metadata you can use the decorated version
+@xray_recorder.capture('## lambda_handler function')
+{% endif -%}
 def lambda_handler(event, context):
     """
         AWS Lambda handler
@@ -96,23 +108,22 @@ def lambda_handler(event, context):
     return message
 {% endif %}
 
-{% if cookiecutter.include_xray == "y" -%}
-# For simple subsegments that don't need annotation/metadata you can use the decorated version
-## @xray_recorder.capture('## get_message_subsegment')
-{% endif -%}
 def get_message():
     {% if cookiecutter.include_xray == "y" -%}
     """
         You can create a sub-segment specifically to a function
-        then capture what sub-segment that is inside your code
         and you can add annotations that will be indexed by X-Ray
-        for example: put_annotation("operation", "query_db")
+        for example: put_annotation("operation", "query_db").
+
+        Similarly, you can also use a sub-segment to add metadata
+        that can be useful for further troubleshooting.
+
+        Return: dict
     """
-    # Only run xray in the AWS Lambda environment
-    if "AWS_SAM_LOCAL" not in os.environ:
-        xray_subsegment = xray_recorder.current_subsegment()
-        xray_subsegment.put_annotation("method", "get_message") # indexed key/value data that X-Ray can use to sort traces by
-        
+    if has_xray_daemon():
+        xray_subsegment = xray_recorder.begin_subsegment('annotations')
+        xray_subsegment.put_annotation("method", "get_message")
+
         # Sample metadata - Same as annotation but non-indexed data + allows for objects/dicts
         # subsegment.put_metadata("operation", "metadata", "python object/json")
         xray_recorder.end_subsegment()
