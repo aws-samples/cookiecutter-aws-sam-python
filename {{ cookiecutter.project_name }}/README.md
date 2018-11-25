@@ -15,6 +15,8 @@
 
 Provided that you have requirements above installed, proceed by building the sample Lambda function:
 
+> **NOTE**: Repeat this process upon source code changes.
+
 ```bash
 make build
 ```
