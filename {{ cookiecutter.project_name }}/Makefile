@@ -100,7 +100,7 @@ _check_event_definition:
 	$(info [*] Checking whether event $(EVENT) exists...)
 
 # EVENT="<name_and_path_of_event>" must be passed as ARG for target or else fail
-ifndef SERVICE
+ifndef EVENT
 	$(error [!] EVENT env not defined...FAIL)
 endif
 
@@ -144,7 +144,7 @@ _install_deps:
 		--disable-pip-version-check \
 		-Ur requirements.txt -t ${SERVICE}/build/
 	@rm -f requirements.txt
-	@cp -a events ${SERVICE}/build/
+	@ln -f events ${SERVICE}/build/events
 
 # Package application and devs together in expected zip from build
 _package: _clone_service_to_build _check_service_definition _install_deps
