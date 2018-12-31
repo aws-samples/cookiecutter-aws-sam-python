@@ -15,6 +15,7 @@ PIPENV ?= pipenv
 ################# 
 
 SERVICE ?= service_not_defined
+EVENT ?= event_not_defined
 
 ############# 
 #  SAM vars	#
@@ -54,6 +55,9 @@ endif
 build: _check_service_definition _clone_service_to_build ##=> Same as package except that we don't create a ZIP
 	@$(MAKE) _install_deps SERVICE="${SERVICE}"
 
+invoke: _check_event_definition ##=> Run SAM Local function with a given event payload
+	@sam local invoke ${SERVICE} --event ${EVENT}
+
 run: ##=> Run SAM Local API GW and can optionally run new containers connected to a defined network
 	@test -z ${NETWORK} \
 		&& sam local start-api \
@@ -90,6 +94,18 @@ endif
 
 ifeq ($(wildcard Pipfile),)
 	$(error [!] Pipfile dependencies file missing from $(BASE) folder...)
+endif
+
+_check_event_definition:
+	$(info [*] Checking whether event $(EVENT) exists...)
+
+# EVENT="<name_and_path_of_event>" must be passed as ARG for target or else fail
+ifndef EVENT
+	$(error [!] EVENT env not defined...FAIL)
+endif
+
+ifeq ($(wildcard $(EVENT)),)
+	$(error [!] '$(EVENT)' file doesn't exist)
 endif
 
 _clone_service_to_build:
@@ -132,6 +148,7 @@ _install_deps:
 		--disable-pip-version-check \
 		-Ur requirements.txt -t ${SERVICE}/build/
 	@rm -f requirements.txt
+	@ln -f events ${SERVICE}/build/events
 
 # Package application and devs together in expected zip from build
 _package: _clone_service_to_build _check_service_definition _install_deps
