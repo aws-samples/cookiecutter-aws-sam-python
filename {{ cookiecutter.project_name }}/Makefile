@@ -72,13 +72,11 @@ test: ##=> Run pytest
 
 _install_packages:
 	$(info [*] Install required packages...)
-	@$(PIPENV) shell \
-	&& @$(PIPENV) install
+	@$(PIPENV) install
 
 _install_dev_packages:
 	$(info [*] Install required dev-packages...)
-	@$(PIPENV) shell \
-	&& @$(PIPENV) install -d
+	@$(PIPENV) install -d
 
 _check_service_definition:
 	$(info [*] Checking whether service $(SERVICE) exists...)
