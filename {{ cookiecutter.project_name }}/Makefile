@@ -109,11 +109,11 @@ endif
 _clone_service_to_build:
 ifeq ($(wildcard $(SERVICE)/build/.),)
 	$(info [+] Setting permissions for files under ${SERVICE}/)
-	find ${SERVICE}/ -type f -exec chmod go+r {} \;
+	@find ${SERVICE}/ -type f -exec chmod go+r {} \;
 	$(info [+] Setting permissions for directories under ${SERVICE}/)
-	find ${SERVICE}/ -type d -exec chmod go+rx {} \;
+	@find ${SERVICE}/ -type d -exec chmod go+rx {} \;
 	$(info [+] Cloning ${SERVICE} directory structure to ${SERVICE}/build)
-	rsync -a -f "+ */" -f "- *" ${SERVICE}/ ${SERVICE}/build/
+	@rsync -a -f "+ */" -f "- *" ${SERVICE}/ ${SERVICE}/build/
 	$(info [+] Cloning source files from ${SERVICE} to ${SERVICE}/build)
 	@find ${SERVICE} -type f \
 			-not -name "*.pyc" \
@@ -124,7 +124,9 @@ ifeq ($(wildcard $(SERVICE)/build/.),)
 	@while read line; do \
 		ln -f ${SERVICE}/$$line ${SERVICE}/build/$$line; \
 	done < .results.txt
-	rm -f .results.txt
+	@rm -f .results.txt
+	$(info [+] Copying events to ${SERVICE}/build)
+	@test -d events && rsync -avz events ${SERVICE}/build/
 else
 	$(info [-] '$(SERVICE)' already has a development build - Ignoring cloning task...)
 endif
@@ -146,7 +148,6 @@ _install_deps:
 		--disable-pip-version-check \
 		-Ur requirements.txt -t ${SERVICE}/build/
 	@rm -f requirements.txt
-	@ln -f events ${SERVICE}/build/events
 
 # Package application and devs together in expected zip from build
 _package: _clone_service_to_build _check_service_definition _install_deps
