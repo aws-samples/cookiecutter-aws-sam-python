@@ -1,12 +1,12 @@
 # Cookiecutter SAM for Python Lambda functions
 
-This is a [Cookiecutter](https://github.com/audreyr/cookiecutter) template to create a Serverless App based on Serverless Application Model (SAM) and Python 3.6.
+This is a [Cookiecutter](https://github.com/audreyr/cookiecutter) template to create a Serverless App based on Serverless Application Model (SAM) and Python 3.8.
 
 It is important to note that you should not try to `git clone` this project but use `cookiecutter` CLI instead as ``{{cookiecutter.project_slug}}`` will be rendered based on your input and therefore all variables and files will be rendered properly.
 
 ## Requirements
 
-Install `cookiecutter` command line: 
+Install `cookiecutter` command line:
 
 **Pip users**:
 
@@ -24,7 +24,7 @@ Install `cookiecutter` command line:
 
 ## Usage
 
-Generate a new SAM based Serverless App: `cookiecutter gh:aws-samples/cookiecutter-aws-sam-python`. 
+Generate a new SAM based Serverless App: `cookiecutter gh:aws-samples/cookiecutter-aws-sam-python`.
 
 You'll be prompted a few questions to help this cookiecutter template to scaffold this project and after its completed you should see a new folder at your current path with the name of the project you gave as input.
 
