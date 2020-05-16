@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
     {{ cookiecutter.project_name }}
-    
+
     {{ cookiecutter.project_short_description }}
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
@@ -22,7 +22,7 @@ Resources:
         Properties:
             CodeUri: first_function/build/
             Handler: app.lambda_handler
-            Runtime: python3.6
+            Runtime: python3.8
 {%- if cookiecutter.include_xray == "y" %}
             Tracing: Active {% endif %} # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
 {%- if cookiecutter.include_apigw == "y" %}

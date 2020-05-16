@@ -10,16 +10,16 @@ BASE := $(shell /bin/pwd)
 CODE_COVERAGE = 72
 PIPENV ?= pipenv
 
-################# 
+#################
 #  Python vars	#
-################# 
+#################
 
 SERVICE ?= service_not_defined
 EVENT ?= event_not_defined
 
-############# 
+#############
 #  SAM vars	#
-############# 
+#############
 
 NETWORK = ""
 
@@ -36,15 +36,15 @@ all: clean build
 
 install: _install_packages _install_dev_packages
 
-shell: 
+shell:
 	@$(PIPENV) shell
-	
+
 package: _check_service_definition ##=> Builds package using Docker Lambda container
 ifeq ($(DOCKER),1)
 	$(info [*] Cleaning up local dev/builds before build task...)
 	@$(MAKE) clean SERVICE="${SERVICE}"
 	$(info [+] Packaging service '$(SERVICE)' using Docker Lambda -- This may take a while...)
-	docker run -v $$PWD:/var/task -it lambci/lambda:build-python3.6 /bin/bash -c 'make _package SERVICE="${SERVICE}"'
+	docker run -v $$PWD:/var/task -it lambci/lambda:build-python3.8 /bin/bash -c 'make _package SERVICE="${SERVICE}"'
 else
 	$(info [*] Cleaning up local builds before build task...)
 	@$(MAKE) clean SERVICE="${SERVICE}"
@@ -66,9 +66,9 @@ run: ##=> Run SAM Local API GW and can optionally run new containers connected t
 test: ##=> Run pytest
 	@AWS_XRAY_CONTEXT_MISSING=LOG_ERROR $(PIPENV) run python -m pytest --cov . --cov-report term-missing --cov-fail-under $(CODE_COVERAGE) tests/ -v
 
-############# 
+#############
 #  Helpers  #
-############# 
+#############
 
 _install_packages:
 	$(info [*] Install required packages...)
@@ -140,7 +140,7 @@ ifeq ($(wildcard $(SERVICE)/build/.),)
 endif
 
 _install_deps:
-	$(info [+] Installing '$(SERVICE)' dependencies...")	
+	$(info [+] Installing '$(SERVICE)' dependencies...")
 	@pip install pipenv
 	@$(PIPENV) lock -r > requirements.txt
 	@$(PIPENV) run pip install \
@@ -154,7 +154,7 @@ _package: _clone_service_to_build _check_service_definition _install_deps
 	@$(MAKE) _zip SERVICE="${SERVICE}"
 
 # As its name states: Zip everything up from build
-_zip: _check_dev_definition 
+_zip: _check_dev_definition
 	$(info [+] Creating '$(SERVICE)' ZIP...")
 	@cd ${SERVICE}/build && zip -rq -9 "$(BASE)/$(SERVICE).zip" * \
 	--exclude "wheel/*" "setuptools/*" "pkg_resources/*" "pip/*" \
