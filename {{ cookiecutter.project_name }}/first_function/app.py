@@ -10,8 +10,10 @@ logger = Logger()
 metrics = Metrics()
 {%- endif %}
 
+
 # Global variables are reused across execution contexts (if available)
 session = boto3.Session()
+
 
 {%- if cookiecutter.include_lambda_powertools == "y" %}
 @metrics.log_metrics
