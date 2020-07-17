@@ -89,7 +89,15 @@ def lambda_handler(event, context):
         {% endif %}
     """
     try:
-        result = {"hello": "world"}
+        message = {"hello": "world"}
+        {% if cookiecutter.include_apigw == "y" %}
+        return {
+            "statusCode": 200,
+            "body": json.dumps(message)
+        }
+        {% else %}
+        return message
+        {% endif %}
     except Exception as e:
         logger.error(e)
         raise e
