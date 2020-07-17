@@ -2,22 +2,22 @@ import boto3
 import json
 import os
 
-{ % - if cookiecutter.include_lambda_powertools == "y" %}
+{%- if cookiecutter.include_lambda_powertools == "y" %}
 from aws_lambda_powertools import Tracer, Logger, Metrics  # https://awslabs.github.io/aws-lambda-powertools-python/#features
 
 tracer = Tracer()
 logger = Logger()
 metrics = Metrics()
-{ % - endif %}
+{%- endif %}
 
 # Global variables are reused across execution contexts (if available)
 session = boto3.Session()
 
-{ % - if cookiecutter.include_lambda_powertools == "y" %}
+{%- if cookiecutter.include_lambda_powertools == "y" %}
 @metrics.log_metrics
 @logger.inject_lambda_context
 @tracer.capture_lambda_handler
-{ % - endif %}
+{%- endif %}
 def lambda_handler(event, context):
     """
         AWS Lambda handler
