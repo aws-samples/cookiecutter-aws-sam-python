@@ -8,12 +8,24 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
     Function:
-        Timeout: 5
+        Timeout: 30
+        MemorySize: 512
+        Handler: app.lambda_handler
+        Runtime: python3.8
+{%- if cookiecutter.include_lambda_powertools == "y" %}
+        Tracing: Active {% endif %} # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
 {%- if cookiecutter.include_safe_deployment == "y" %}
         AutoPublishAlias: live # More info about Safe Deployments: https://github.com/awslabs/serverless-application-model/blob/master/docs/safe_lambda_deployments.rst
         DeploymentPreference:
             Type: Linear10PercentEvery1Minute {% endif %}
-
+        Environment:
+            Variables:
+                LOG_LEVEL: INFO
+{%- if cookiecutter.include_lambda_powertools == "y" %}
+                POWERTOOLS_LOGGER_SAMPLE_RATE: 1
+                POWERTOOLS_LOGGER_LOG_EVENT: true
+                POWERTOOLS_METRICS_NAMESPACE: MyServerlessApplication
+{%- endif %}
 
 Resources:
 
@@ -21,10 +33,8 @@ Resources:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
         Properties:
             CodeUri: first_function/build/
-            Handler: app.lambda_handler
-            Runtime: python3.8
-{%- if cookiecutter.include_xray == "y" %}
-            Tracing: Active {% endif %} # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
+            FunctionName: my-first-function
+            Description: My First Function
 {%- if cookiecutter.include_apigw == "y" %}
             Events:
                 CatchAll:
@@ -43,6 +53,14 @@ Resources:
             Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
                 Variables:
                     PARAM1: VALUE
+{%- if cookiecutter.include_lambda_powertools == "y" %}
+                    POWERTOOLS_SERVICE_NAME: MyFirstFunction
+{%- endif %}
+            Tags:
+                - Key: SOLUTION
+                  Value: MyServerlessApplication
+                - Key: SOLUTION_MODULE
+                  Value: MyFirstFunction
 
     # Sample policy to add additional permissions to your Lambda
     FirstFunctionAdditionalPermission:
@@ -58,6 +76,11 @@ Resources:
                         Resource: "*"
             Roles:
                 - !Ref FirstFunctionRole # Sample policy to demonstrate Implicit IAM Role created with SAM
+            Tags:
+                - Key: SOLUTION
+                  Value: MyServerlessApplication
+                - Key: SOLUTION_MODULE
+                  Value: MyFirstFunction
 
 Outputs:
 {% if cookiecutter.include_apigw == "y"%}
