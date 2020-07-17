@@ -1,4 +1,4 @@
 boto3
-{%- if cookiecutter.include_xray == "y" %}
-aws-xray-sdk
+{%- if cookiecutter.include_lambda_powertools == "y" %}
+aws-lambda-powertools
 {% endif %}
