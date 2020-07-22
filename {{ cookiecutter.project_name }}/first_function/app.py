@@ -16,7 +16,7 @@ session = boto3.Session()
 
 {%- if cookiecutter.include_lambda_powertools == "y" %}
 
-@metrics.log_metrics
+@metrics.log_metrics(capture_cold_start_metric=True)
 @logger.inject_lambda_context
 @tracer.capture_lambda_handler
 {%- endif %}
@@ -101,5 +101,5 @@ def lambda_handler(event, context):
         return message
         {% endif %}
     except Exception as e:
-        logger.error(e)
+        logger.exception(e)
         raise e
