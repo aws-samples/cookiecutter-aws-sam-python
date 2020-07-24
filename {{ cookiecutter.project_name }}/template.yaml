@@ -11,8 +11,7 @@ Globals:
         Timeout: 5
         Handler: app.lambda_handler
         Runtime: python3.8
-{%- if cookiecutter.include_lambda_powertools == "y" %}
-        Tracing: Active {% endif %} # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
+        Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
 {%- if cookiecutter.include_safe_deployment == "y" %}
         AutoPublishAlias: live # More info about Safe Deployments: https://github.com/awslabs/serverless-application-model/blob/master/docs/safe_lambda_deployments.rst
         DeploymentPreference:
@@ -20,14 +19,12 @@ Globals:
         Environment:
             Variables:
                 LOG_LEVEL: INFO
-{%- if cookiecutter.include_lambda_powertools == "y" %}
                 POWERTOOLS_LOGGER_SAMPLE_RATE: 0.1
                 POWERTOOLS_LOGGER_LOG_EVENT: true
                 POWERTOOLS_METRICS_NAMESPACE: MyServerlessApplication
-{%- endif %}
+                POWERTOOLS_SERVICE_NAME: MyFirstService
 
 Resources:
-
     FirstFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
         Properties:
@@ -52,9 +49,6 @@ Resources:
             Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
                 Variables:
                     PARAM1: VALUE
-{%- if cookiecutter.include_lambda_powertools == "y" %}
-                    POWERTOOLS_SERVICE_NAME: MyFirstFunction
-{%- endif %}
             Tags:
                 - Key: SOLUTION
                   Value: MyServerlessApplication

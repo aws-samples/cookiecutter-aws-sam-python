@@ -1,4 +1,2 @@
 boto3
-{%- if cookiecutter.include_lambda_powertools == "y" %}
 aws-lambda-powertools
-{% endif %}
