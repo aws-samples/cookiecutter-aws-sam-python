@@ -29,7 +29,7 @@ Resources:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
         Properties:
             Handler: app.lambda_handler
-            CodeUri: first_function/build/
+            CodeUri: first_function
             Description: My First Function
 {%- if cookiecutter.include_apigw == "y" %}
             Events:
@@ -50,10 +50,8 @@ Resources:
                 Variables:
                     PARAM1: VALUE
             Tags:
-                - Key: SOLUTION
-                  Value: MyServerlessApplication
-                - Key: SOLUTION_MODULE
-                  Value: MyFirstFunction
+                SOLUTION: MyServerlessApplication
+                SOLUTION_MODULE: MyFirstFunction
 
     # Sample policy to add additional permissions to your Lambda
     FirstFunctionAdditionalPermission:
