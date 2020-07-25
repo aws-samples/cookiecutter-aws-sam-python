@@ -18,6 +18,7 @@ Globals:
             Type: Linear10PercentEvery1Minute {% endif %}
         Environment:
             Variables:
+                # Powertools env vars: https://awslabs.github.io/aws-lambda-powertools-python/#environment-variables
                 LOG_LEVEL: INFO
                 POWERTOOLS_LOGGER_SAMPLE_RATE: 0.1
                 POWERTOOLS_LOGGER_LOG_EVENT: true
