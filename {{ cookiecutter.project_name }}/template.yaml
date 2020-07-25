@@ -9,7 +9,6 @@ Description: >
 Globals:
     Function:
         Timeout: 5
-        Handler: app.lambda_handler
         Runtime: python3.8
         Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
 {%- if cookiecutter.include_safe_deployment == "y" %}
@@ -29,6 +28,7 @@ Resources:
     FirstFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
         Properties:
+            Handler: app.lambda_handler
             CodeUri: first_function/build/
             FunctionName: my-first-function
             Description: My First Function
