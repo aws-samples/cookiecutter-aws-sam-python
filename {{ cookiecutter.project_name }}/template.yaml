@@ -3,35 +3,38 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
     {{ cookiecutter.project_name }}
 
-    {{ cookiecutter.project_short_description }}
-
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
     Function:
         Timeout: 5
+        Runtime: python3.8
+        Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
 {%- if cookiecutter.include_safe_deployment == "y" %}
         AutoPublishAlias: live # More info about Safe Deployments: https://github.com/awslabs/serverless-application-model/blob/master/docs/safe_lambda_deployments.rst
         DeploymentPreference:
             Type: Linear10PercentEvery1Minute {% endif %}
-
+        Environment:
+            Variables:
+                # Powertools env vars: https://awslabs.github.io/aws-lambda-powertools-python/#environment-variables
+                LOG_LEVEL: INFO
+                POWERTOOLS_LOGGER_SAMPLE_RATE: 0.1
+                POWERTOOLS_LOGGER_LOG_EVENT: true
+                POWERTOOLS_METRICS_NAMESPACE: MyServerlessApplication
+                POWERTOOLS_SERVICE_NAME: hello
 
 Resources:
-
-    FirstFunction:
+    HelloWorldFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
         Properties:
-            CodeUri: first_function/build/
             Handler: app.lambda_handler
-            Runtime: python3.8
-{%- if cookiecutter.include_xray == "y" %}
-            Tracing: Active {% endif %} # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
-{%- if cookiecutter.include_apigw == "y" %}
+            CodeUri: hello_world
+            Description: Hello World function
             Events:
                 CatchAll:
                     Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
                     Properties:
-                        Path: /first/{any_argument+}
-                        Method: any {% endif %}
+                        Path: /hello
+                        Method: GET
             # Policies: # Example inline policy
             #     - Version: "2012-10-17"
             #     Statement:
@@ -43,9 +46,12 @@ Resources:
             Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
                 Variables:
                     PARAM1: VALUE
+            Tags:
+                SOLUTION: MyServerlessApplication
+                SOLUTION_MODULE: MyHelloWorldFunction
 
     # Sample policy to add additional permissions to your Lambda
-    FirstFunctionAdditionalPermission:
+    HelloWorldFunctionAdditionalPermission:
         Type: "AWS::IAM::Policy"
         Properties:
             PolicyName: "root"
@@ -57,16 +63,14 @@ Resources:
                         Action: "ssm:GetParameters"
                         Resource: "*"
             Roles:
-                - !Ref FirstFunctionRole # Sample policy to demonstrate Implicit IAM Role created with SAM
+                - !Ref HelloWorldFunctionRole # Sample policy to demonstrate Implicit IAM Role created with SAM
 
 Outputs:
-{% if cookiecutter.include_apigw == "y"%}
-    FirstApigwURL:
-      Description: "API Gateway endpoint URL for Prod environment for First Function"
-      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/first/proxy"
-{%- endif %}
+    HelloWorldApigwURL:
+      Description: "API Gateway endpoint URL for Prod environment for Hello World Function"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello"
 
-    FirstFunction:
-      Description: "First Lambda Function ARN"
-      Value: !GetAtt FirstFunction.Arn
+    HelloWorldFunction:
+      Description: "Hello World Lambda Function ARN"
+      Value: !GetAtt HelloWorldFunction.Arn
 

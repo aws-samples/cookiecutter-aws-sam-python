@@ -1,19 +1,16 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
 
 [packages]
-
 boto3 = "*"
-{%- if cookiecutter.include_xray == "y" %}
-aws-xray-sdk = "*"
-{% endif %}
+aws-lambda-powertools = "*"
 
 [dev-packages]
 
+boto3 = "*"
 pytest = "*"
 pytest-cov = "*"
 

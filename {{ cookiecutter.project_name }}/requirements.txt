@@ -1,4 +1,0 @@
-boto3
-{%- if cookiecutter.include_xray == "y" %}
-aws-xray-sdk
-{% endif %}
