@@ -67,11 +67,6 @@ Resources:
                         Resource: "*"
             Roles:
                 - !Ref FirstFunctionRole # Sample policy to demonstrate Implicit IAM Role created with SAM
-            Tags:
-                - Key: SOLUTION
-                  Value: MyServerlessApplication
-                - Key: SOLUTION_MODULE
-                  Value: MyFirstFunction
 
 Outputs:
 {% if cookiecutter.include_apigw == "y"%}
