@@ -30,7 +30,6 @@ Resources:
         Properties:
             Handler: app.lambda_handler
             CodeUri: first_function/build/
-            FunctionName: my-first-function
             Description: My First Function
 {%- if cookiecutter.include_apigw == "y" %}
             Events:
