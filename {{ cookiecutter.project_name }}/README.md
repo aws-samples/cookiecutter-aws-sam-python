@@ -2,14 +2,31 @@
 
 {{ cookiecutter.project_short_description }}
 
+This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes [Lambda Powertools for operational best practices](https://github.com/awslabs/aws-lambda-powertools-python), and the following files and folders.
+
+- **`hello_world`** - Code for the application's Lambda function.
+- **`events`** - Invocation events that you can use to invoke the function.
+- **`tests`** - Unit tests for the application code. 
+- **`template`.yaml** - A template that defines the application's AWS resources.
+
+If you prefer to use an integrated development environment (IDE) to build and test your application, you can use the AWS Toolkit.  
+
+* [VS Code](https://docs.aws.amazon.com/toolkit-for-vscode/latest/userguide/welcome.html)
+* [PyCharm](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
+* [IntelliJ](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
+* [Visual Studio](https://docs.aws.amazon.com/toolkit-for-visual-studio/latest/user-guide/welcome.html)
+
 ## Requirements
 
-* AWS CLI with Administrator permission
+**Make sure you have the following installed before you proceed**
+
+* AWS CLI - [Install AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) configured with Administrator permission
+* SAM CLI - [Install the SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
 * [Python 3 installed](https://www.python.org/downloads/)
-* [Pipenv installed](https://github.com/pypa/pipenv)
-    - `pip install pipenv`
-* [Docker installed](https://www.docker.com/community-edition)
-* [SAM Local installed](https://github.com/awslabs/aws-sam-local) 
+* Docker - [Install Docker community edition](https://hub.docker.com/search/?type=edition&offering=community)
+* [Pipenv installed](https://github.com/pypa/pipenv) - `pip install pipenv`
+
+## Deploy the sample application
 
 {% if cookiecutter.include_experimental_make == "y" %}
 As you've chosen the experimental Makefile we can use Make to automate Packaging and Building steps as follows:
@@ -32,117 +49,102 @@ As you've chosen the experimental Makefile we can use Make to automate Packaging
         ...::: Run SAM Invoke Function :::...
         make invoke SERVICE="FirstFunction" EVENT="events/first_function_event.json"
 ```
-{% else %}
-Provided that you have requirements above installed, proceed by installing the application dependencies and development dependencies:
-
-```bash
-pipenv install
-pipenv install -d
-```
 {% endif %}
 
-## Testing
+To build and deploy your application for the first time, run the following in your shell:
 
-`Pytest` is used to discover tests created under `tests` folder - Here's how you can run tests our initial unit tests:
-
-{% if cookiecutter.include_experimental_make == "y" %}
 ```bash
-make test
-```
-{% else %}
-```bash
-AWS_XRAY_CONTEXT_MISSING=LOG_ERROR pipenv run python -m pytest tests/ -v
+{{ cookiecutter.project_name }}$ sam build --use-container
+{{ cookiecutter.project_name }}$ sam deploy --guided
 ```
 
-**Tip**: Commands passed to `pipenv run` will be executed in the Virtual environment created for our project.
-{% endif %}
+The first command will **build** the source of your application within a Docker container. The second command will **package and deploy** your application to AWS, with a series of prompts asking you about the name of the CloudFormation Stack, AWS Region, and whether you want SAM CLI to save your choices so you can use `sam deploy` next time.
 
-## Packaging
+## Use the SAM CLI to build and test locally
 
-AWS Lambda Python runtime requires a flat folder with all dependencies including the application. To facilitate this process, the pre-made SAM template expects this structure to be under `first_function/build/`:
+Build your application dependencies with `sam build --use-container` command.
+
+```bash
+{{ cookiecutter.project_name }}$ sam build --use-container
+```
+
+The SAM CLI installs dependencies defined in `hello_world/requirements.txt`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
+
+Test a single function by invoking it directly with a test event. An event is a JSON document that represents the input that the function receives from the event source. Test events are included in the `events` folder in this project.
+
+Run functions locally and invoke them with the `sam local invoke` command.
+
+```bash
+{{ cookiecutter.project_name }}$ sam local invoke HelloWorldFunction --event events/hello_world_event.json
+```
+
+The SAM CLI can also emulate your application's API. Use the `sam local start-api` to run the API locally on port 3000.
+
+```bash
+{{ cookiecutter.project_name }}$ sam local start-api
+{{ cookiecutter.project_name }}$ curl http://localhost:3000/hello
+```
+
+The SAM CLI reads the application template to determine the API's routes and the functions that they invoke. The `Events` property on each function's definition includes the route and method for each path.
 
 ```yaml
-...
-    FirstFunction:
-        Type: AWS::Serverless::Function
-        Properties:
-            CodeUri: first_function/build/
-            ...
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
 ```
 
-With that in mind, we will:
+## Fetch, tail, and filter Lambda function logs
 
-1. Generate a hashed `requirements.txt` out of our `Pipfile` dep file
-1. Install all dependencies directly to `build` sub-folder
-2. Copy our function (app.py) into `build` sub-folder
+To simplify troubleshooting, SAM CLI has a command called `sam logs`. `sam logs` lets you fetch logs generated by your deployed Lambda function from the command line. In addition to printing the logs on the terminal, this command has several nifty features to help you quickly find the bug.
+
+`NOTE`: This command works for all AWS Lambda functions; not just the ones you deploy using SAM.
+
+```bash
+{{ cookiecutter.project_name }}$ sam logs -n HelloWorldFunction --stack-name sam-python --tail
+```
+
+You can find more information and examples about filtering Lambda function logs in the [SAM CLI Documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-logging.html).
+
+## Unit tests
+
+Tests are defined in the `tests` folder in this project - Use Pipenv to install dev dependencies and to run unit tests
 
 {% if cookiecutter.include_experimental_make == "y" %}
-Given that you've chosen a Makefile these steps are automated by simply running: ``make build SERVICE="first_function"``
-
+```bash
+{{ cookiecutter.project_name }}$ pipenv install -d
+{{ cookiecutter.project_name }}$ make test
+```
 {% else %}
 ```bash
-# Create a hashed pip requirements.txt file only with our app dependencies (no dev deps)
-pipenv lock -r > requirements.txt
-pip install -r requirements.txt -t first_function/build/
-cp -R first_function/app.py first_function/build/
+{{ cookiecutter.project_name }}$ pipenv install -d
+{{ cookiecutter.project_name }}$ POWERTOOLS_TRACE_DISABLED=1 pipenv run python -m pytest tests/ -v
 ```
 {% endif %}
 
-### Local development
+## Cleanup
 
-Given that you followed Packaging instructions then run the following to invoke your function locally:
-
-**Invoking function locally using an event as JSON**
+To delete the sample application that you created, use the AWS CLI. Assuming you used your project name for the stack name, you can run the following:
 
 ```bash
-sam local invoke -e event.json HelloWorldFunction
+{{ cookiecutter.project_name }}$ aws cloudformation delete-stack --stack-name {{ cookiecutter.project_name }}
 ```
 
-**Invoking function locally through local API Gateway**
+## Powertools
 
-```bash
-sam local start-api
-```
+**Tracing**
 
-If the previous command run successfully you should now be able to hit the following local endpoint to invoke your function `http://localhost:3000/hello`.
+[Tracer utility](https://awslabs.github.io/aws-lambda-powertools-python/core/tracer/) to patch and trace the execution of this sample code, including metadata.
 
+**Logger**
 
-## Deployment
+[Logger utility](https://awslabs.github.io/aws-lambda-powertools-python/core/logger/) creates an opinionated application Logger with structured logging as the output, dynamically samples 10% of your logs in DEBUG mode for concurrent invocations, log incoming events as your function is invoked, and injects key information from Lambda context object into your Logger.
 
-First and foremost, we need a S3 bucket where we can upload our Lambda functions packaged as ZIP before we deploy anything - If you don't have a S3 bucket to store code artifacts then this is a good time to create one:
+**Metrics**
 
-```bash
-aws s3 mb s3://BUCKET_NAME
-```
-
-Provided you have a S3 bucket created, run the following command to package our Lambda function to S3:
-
-```bash
-aws cloudformation package \
-    --template-file template.yaml \
-    --output-template-file packaged.yaml \
-    --s3-bucket REPLACE_THIS_WITH_YOUR_S3_BUCKET_NAME
-```
-
-Next, the following command will create a Cloudformation Stack and deploy your SAM resources.
-
-```bash
-aws cloudformation deploy \
-    --template-file packaged.yaml \
-    --stack-name {{ cookiecutter.project_name.lower().replace(' ', '-') }} \
-    --capabilities CAPABILITY_IAM
-```
-
-> **See [Serverless Application Model (SAM) HOWTO Guide](https://github.com/awslabs/serverless-application-model/blob/master/HOWTO.md) for more details in how to get started.**
-
-After deployment is complete you can run the following command to retrieve the API Gateway Endpoint URL:
-
-```bash
-aws cloudformation describe-stacks \
-    --stack-name {{ cookiecutter.project_name.lower().replace(' ', '-') }} \
-    --query 'Stacks[].Outputs'
-``` 
-{% endif %}
+[Metrics utility](https://awslabs.github.io/aws-lambda-powertools-python/core/metrics/) captures cold start metric of your Lambda invocation, and could add additional metrics to help you understand your application KPIs.
 
 # Appendix
 
@@ -163,24 +165,10 @@ The following make targets will automate that we went through above:
     - **This is particularly useful when using C-extensions that if built on your OS may not work when deployed to Lambda (different OS)**
 {% endif %}
 
-## AWS CLI commands
+## Sync project with function dependencies
 
-AWS CLI commands to package, deploy and describe outputs defined within the cloudformation stack:
+Pipenv takes care of isolating dev dependencies and app dependencies. As SAM CLI requires a `requirements.txt` file, you'd need to generate one if new app dependencies have been added:
 
 ```bash
-aws cloudformation package \
-    --template-file template.yaml \
-    --output-template-file packaged.yaml \
-    --s3-bucket REPLACE_THIS_WITH_YOUR_S3_BUCKET_NAME
-
-aws cloudformation deploy \
-    --template-file packaged.yaml \
-    --stack-name {{ cookiecutter.project_name.lower().replace(' ', '-') }} \
-    --capabilities CAPABILITY_IAM \
-    --parameter-overrides MyParameterSample=MySampleValue
-
-aws cloudformation describe-stacks \
-    --stack-name {{ cookiecutter.project_name.lower().replace(' ', '-') }} --query 'Stacks[].Outputs'
+{{ cookiecutter.project_name }}$ pipenv lock -r > hello_world/requirements.txt
 ```
-
-## Running 
