@@ -3,8 +3,6 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
     {{ cookiecutter.project_name }}
 
-    {{ cookiecutter.project_short_description }}
-
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
     Function:
