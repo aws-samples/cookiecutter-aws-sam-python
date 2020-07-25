@@ -1,7 +1,6 @@
 {
     "project_name": "Name of the project",
     "project_short_description": "A short description of the project",
-    "include_apigw": "y",
     "include_safe_deployment": "y",
     "include_experimental_make": "n"
 }

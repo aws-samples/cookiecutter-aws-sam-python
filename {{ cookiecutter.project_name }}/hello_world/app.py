@@ -50,7 +50,6 @@ def lambda_handler(event, context):
             https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
 
         event: dict, required
-        {% if cookiecutter.include_apigw == "y" %}
             API Gateway Lambda Proxy Input Format
 
             {
@@ -67,10 +66,9 @@ def lambda_handler(event, context):
             }
 
             https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
-        {% endif %}
+
         Returns
         ------
-        {% if cookiecutter.include_apigw == "y" %}
         API Gateway Lambda Proxy Output Format: dict
             'statusCode' and 'body' are required
 
@@ -83,18 +81,13 @@ def lambda_handler(event, context):
 
             # api-gateway-simple-proxy-for-lambda-output-format
             https: // docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
-        {% endif %}
     """
     try:
         message = {"hello": "world"}
-        {% if cookiecutter.include_apigw == "y" %}
         return {
             "statusCode": 200,
             "body": json.dumps(message)
         }
-        {% else %}
-        return message
-        {% endif %}
     except Exception as e:
         logger.exception(e)
-        raise e
+        raise

@@ -35,7 +35,6 @@ You'll be prompted a few questions to help this cookiecutter template to scaffol
 
 Option | Description
 ------------------------------------------------- | ---------------------------------------------------------------------------------
-`include_apigw` | Includes sample code for API Gateway Proxy integration for Lambda and a Catch All method in SAM as a starting point
 `include_safe_deployment` | Sends by default 10% of traffic for every 1 minute to a newly deployed function using [CodeDeploy + SAM integration](https://github.com/awslabs/serverless-application-model/blob/master/docs/safe_lambda_deployments.rst) - Linear10PercentEvery1Minute
 `include_experimental_make` | Includes a `Makefile` for advanced users to automate packaging, build, tests and SAM Local - Only works on OSX/Linux at the moment 
 

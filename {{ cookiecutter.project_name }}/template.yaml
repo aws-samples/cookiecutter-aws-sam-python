@@ -31,13 +31,12 @@ Resources:
             Handler: app.lambda_handler
             CodeUri: hello_world
             Description: Hello World function
-{%- if cookiecutter.include_apigw == "y" %}
             Events:
                 CatchAll:
                     Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
                     Properties:
                         Path: /hello
-                        Method: GET {% endif %}
+                        Method: GET
             # Policies: # Example inline policy
             #     - Version: "2012-10-17"
             #     Statement:
@@ -69,11 +68,9 @@ Resources:
                 - !Ref HelloWorldFunctionRole # Sample policy to demonstrate Implicit IAM Role created with SAM
 
 Outputs:
-{% if cookiecutter.include_apigw == "y"%}
     HelloWorldApigwURL:
       Description: "API Gateway endpoint URL for Prod environment for Hello World Function"
       Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello"
-{%- endif %}
 
     HelloWorldFunction:
       Description: "Hello World Lambda Function ARN"

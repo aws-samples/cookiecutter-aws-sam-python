@@ -92,27 +92,19 @@ cp -R first_function/app.py first_function/build/
 
 Given that you followed Packaging instructions then run the following to invoke your function locally:
 
-{% if cookiecutter.include_apigw == "y" %}
+**Invoking function locally using an event as JSON**
+
+```bash
+sam local invoke -e event.json HelloWorldFunction
+```
+
 **Invoking function locally through local API Gateway**
 
 ```bash
 sam local start-api
 ```
 
-If the previous command run successfully you should now be able to hit the following local endpoint to invoke your function `http://localhost:3000/first/REPLACE-ME-WITH-ANYTHING`.
-{% else %}
-**Invoking function locally without API Gateway**
-
-```bash
-echo '{"lambda": "payload"}' | sam local invoke FirstFunction
-```
-
-You can also specify a `event.json` file with the payload you'd like to invoke your function with:
-
-```bash
-sam local invoke -e event.json FirstFunction
-```
-{% endif %}
+If the previous command run successfully you should now be able to hit the following local endpoint to invoke your function `http://localhost:3000/hello`.
 
 
 ## Deployment
@@ -143,7 +135,6 @@ aws cloudformation deploy \
 
 > **See [Serverless Application Model (SAM) HOWTO Guide](https://github.com/awslabs/serverless-application-model/blob/master/HOWTO.md) for more details in how to get started.**
 
-{% if cookiecutter.include_apigw == "y" %}
 After deployment is complete you can run the following command to retrieve the API Gateway Endpoint URL:
 
 ```bash
