@@ -1,13 +1,13 @@
 import json
 import pytest
 from .mock import MockContext
-from first_function import app
+from hello_world import app
 
 {% if cookiecutter.include_apigw == "y" %}
 @pytest.fixture()
 def apigw_event():
     """ Generates API GW Event"""
-    with open("./events/first_function_apigw_event.json", "r") as fp:
+    with open("./events/hello_world_apigw_event.json", "r") as fp:
         return json.load(fp)
 
 def test_lambda_handler(apigw_event):
@@ -20,7 +20,7 @@ def test_lambda_handler(apigw_event):
 @pytest.fixture()
 def lambda_event():
     """ Generates Lambda Event"""
-    with open("./events/first_function_event.json", "r") as fp:
+    with open("./events/hello_world_event.json", "r") as fp:
         return json.load(fp)
 
 def test_lambda_handler(lambda_event):
