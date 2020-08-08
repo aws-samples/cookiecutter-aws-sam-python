@@ -41,7 +41,7 @@ deploy.guided: ##=> Guided deploy that is typically run for the first time only
 deploy: ##=> Deploy app using previously saved SAM CLI configuration
 	sam deploy
 
-invoke: _check_event_definition ##=> Run SAM Local function with a given event payload
+invoke: ##=> Run SAM Local function with a given event payload
 	@sam local invoke HelloWorldFunction --event events/hello_world_event.json
 
 run: ##=> Run SAM Local API GW and can optionally run new containers connected to a defined network
