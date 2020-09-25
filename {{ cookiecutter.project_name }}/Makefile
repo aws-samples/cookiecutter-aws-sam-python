@@ -23,8 +23,9 @@ all: clean build
 install:
 	$(info [*] Installing pipenv)
 	@pip install pipenv --upgrade
+	$(MAKE) dev
 
-dev: install
+dev:
 	$(info [*] Installing pipenv project dependencies)
 	@$(PIPENV) install
 	@$(PIPENV) install -d
@@ -50,7 +51,7 @@ run: ##=> Run SAM Local API GW and can optionally run new containers connected t
 		|| sam local start-api --docker-network ${NETWORK}
 
 test: ##=> Run pytest
-	@POWERTOOLS_TRACE_DISABLED=1 $(PIPENV) run python -m pytest --cov . --cov-report term-missing --cov-fail-under $(CODE_COVERAGE) tests/ -v
+	@POWERTOOLS_TRACE_DISABLED=1 POWERTOOLS_METRICS_NAMESPACE="MyServerlessApplication" $(PIPENV) run python -m pytest --cov . --cov-report term-missing --cov-fail-under $(CODE_COVERAGE) tests/ -v
 
 ci: ##=> Run full workflow - Install deps, build deps, and deploy
 	$(MAKE) dev
@@ -75,14 +76,17 @@ define HELP_MESSAGE
 
 	Common usage:
 
-	...::: Installs Pipenv :::...
-	$ make install
-	
 	...::: Installs Pipenv, application and dev dependencies defined in Pipfile :::...
 	$ make install
 
 	...::: Builds Lambda function dependencies:::...
 	$ make build
+
+	...::: Deploy for the first time :::...
+	$ make deploy.guided
+
+	...::: Deploy subsequent changes :::...
+	$ make deploy
 
 	...::: Run SAM Local API Gateway :::...
 	$ make run
