@@ -51,7 +51,7 @@ run: ##=> Run SAM Local API GW and can optionally run new containers connected t
 		|| sam local start-api --docker-network ${NETWORK}
 
 test: ##=> Run pytest
-	@POWERTOOLS_TRACE_DISABLED=1 POWERTOOLS_METRICS_NAMESPACE="MyServerlessApplication" $(PIPENV) run python -m pytest --cov . --cov-report term-missing --cov-fail-under $(CODE_COVERAGE) tests/ -v
+	@POWERTOOLS_TRACE_DISABLED=1 POWERTOOLS_METRICS_NAMESPACE="MyServerlessApplication" $(PIPENV) run python -m pytest --cov . --cov-report term-missing --cov-fail-under $(CODE_COVERAGE) tests/ -vv
 
 ci: ##=> Run full workflow - Install deps, build deps, and deploy
 	$(MAKE) dev

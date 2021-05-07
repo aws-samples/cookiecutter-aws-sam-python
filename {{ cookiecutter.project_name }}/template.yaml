@@ -3,14 +3,24 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
     {{ cookiecutter.project_name }}
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
-Globals:
+Globals: # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-template-anatomy-globals.html
+    Api:
+        EndpointConfiguration: REGIONAL
+        TracingEnabled: true
+        Cors:                               # https://awslabs.github.io/aws-lambda-powertools-python/latest/core/event_handler/api_gateway/#cors
+            # AllowOrigin: "'https://example.com'"
+            AllowOrigin: "'*'"  # Dev only
+            AllowHeaders: "'Content-Type,Authorization,X-Amz-Date'"
+            MaxAge: "'300'"
+        BinaryMediaTypes:                   # https://awslabs.github.io/aws-lambda-powertools-python/latest/core/event_handler/api_gateway/#binary-responses
+          - '*~1*'  # converts to */* for any binary type
     Function:
         Timeout: 5
+        MemorySize: 256
         Runtime: python3.8
         Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
 {%- if cookiecutter.include_safe_deployment == "y" %}
-        AutoPublishAlias: live # More info about Safe Deployments: https://github.com/awslabs/serverless-application-model/blob/master/docs/safe_lambda_deployments.rst
+        AutoPublishAlias: live # More info about Safe Deployments: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-deploymentpreference.html
         DeploymentPreference:
             Type: Linear10PercentEvery1Minute {% endif %}
         Environment:
@@ -24,16 +34,21 @@ Globals:
 
 Resources:
     HelloWorldFunction:
-        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+        Type: AWS::Serverless::Function # More info about Function Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
         Properties:
             Handler: app.lambda_handler
             CodeUri: hello_world
             Description: Hello World function
             Events:
-                CatchAll:
-                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                HelloPath:
+                    Type: Api # More info about API Event Source: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-api.html
                     Properties:
                         Path: /hello
+                        Method: GET
+                HelloYou:
+                    Type: Api
+                    Properties:
+                        Path: /hello/{name}
                         Method: GET
             # Policies: # Example inline policy
             #     - Version: "2012-10-17"
@@ -43,27 +58,26 @@ Resources:
             #             - "ssm:GetParameter"
             #         Resource:
             #             - "*"
-            Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+            Environment:
                 Variables:
                     PARAM1: VALUE
             Tags:
-                SOLUTION: MyServerlessApplication
-                SOLUTION_MODULE: MyHelloWorldFunction
+                LambdaPowertools: python
 
     # Sample policy to add additional permissions to your Lambda
-    HelloWorldFunctionAdditionalPermission:
-        Type: "AWS::IAM::Policy"
-        Properties:
-            PolicyName: "root"
-            PolicyDocument:
-                Version: "2012-10-17"
-                Statement:
-                    -
-                        Effect: "Allow"
-                        Action: "ssm:GetParameters"
-                        Resource: "*"
-            Roles:
-                - !Ref HelloWorldFunctionRole # Sample policy to demonstrate Implicit IAM Role created with SAM
+    # HelloWorldFunctionAdditionalPermission:
+    #     Type: "AWS::IAM::Policy"
+    #     Properties:
+    #         PolicyName: "root"
+    #         PolicyDocument:
+    #             Version: "2012-10-17"
+    #             Statement:
+    #                 -
+    #                     Effect: "Allow"
+    #                     Action: "ssm:GetParameters"
+    #                     Resource: "*"
+    #         Roles:
+    #             - !Ref HelloWorldFunctionRole # Sample policy to demonstrate Implicit IAM Role created with SAM
 
 Outputs:
     HelloWorldApigwURL:
