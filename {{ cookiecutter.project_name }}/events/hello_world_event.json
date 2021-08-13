@@ -2,7 +2,7 @@
   "body": "hello",
   "resource": "/hello",
   "path": "/hello",
-  "httpMethod": "POST",
+  "httpMethod": "GET",
   "isBase64Encoded": true,
   "queryStringParameters": {
     "foo": "bar"
