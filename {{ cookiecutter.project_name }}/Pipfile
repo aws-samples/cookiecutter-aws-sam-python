@@ -11,6 +11,7 @@ aws-lambda-powertools = "*"
 [dev-packages]
 
 boto3 = "*"
+boto3-stubs = "*"
 pytest = "*"
 pytest-cov = "*"
 
