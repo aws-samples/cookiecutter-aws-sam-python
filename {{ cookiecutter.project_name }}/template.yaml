@@ -23,6 +23,10 @@ Globals: # https://docs.aws.amazon.com/serverless-application-model/latest/devel
         AutoPublishAlias: live # More info about Safe Deployments: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-deploymentpreference.html
         DeploymentPreference:
             Type: Linear10PercentEvery1Minute {% endif %}
+        # Embed Lambda Powertools as a shared Layer
+        # See: https://awslabs.github.io/aws-lambda-powertools-python/latest/#lambda-layer
+        Layers: # 
+            - !Sub arn:aws:lambda:${AWS::Region}:017000801446:layer:AWSLambdaPowertoolsPython:6
         Environment:
             Variables:
                 # Powertools env vars: https://awslabs.github.io/aws-lambda-powertools-python/#environment-variables
