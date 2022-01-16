@@ -20,7 +20,13 @@ def lambda_context():
 
 
 @pytest.fixture()
-def apigw_event():
+def apigw_hello_event():
     """ Generates API GW Event"""
-    with open("./events/hello_world_event.json", "r") as fp:
+    with open("./events/hello_world_hello_endpoint_event.json", "r") as fp:
+        return json.load(fp)
+
+@pytest.fixture()
+def apigw_hello_you_event():
+    """ Generates API GW Event"""
+    with open("./events/hello_world_hello_you_endpoint_event.json", "r") as fp:
         return json.load(fp)
