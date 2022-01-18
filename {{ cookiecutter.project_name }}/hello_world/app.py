@@ -1,37 +1,38 @@
-import json
-import os
-
-import boto3
 from aws_lambda_powertools import Logger, Metrics, Tracer
-from aws_lambda_powertools.logging import correlation_paths
-from aws_lambda_powertools.utilities.typing import LambdaContext
 from aws_lambda_powertools.event_handler.api_gateway import ApiGatewayResolver
+from aws_lambda_powertools.logging import correlation_paths
+from aws_lambda_powertools.metrics import MetricUnit
 
-# https://awslabs.github.io/aws-lambda-powertools-python/#features
-tracer = Tracer()
-logger = Logger()
-metrics = Metrics()
+logger = Logger(service="APP")
+tracer = Tracer(service="APP")
+metrics = Metrics(namespace="MyApp", service="APP")
 app = ApiGatewayResolver()
-
-# Global variables are reused across execution contexts (if available)
-# session = boto3.Session()
-
-@app.get("/hello")
-def hello():
-    query_string_name = app.current_event.get_query_string_value(name="name", default_value="universe")
-    return {"message": f"hello {query_string_name}"}
 
 
 @app.get("/hello/<name>")
-def hello_you(name):
-    # query_strings_as_dict = app.current_event.query_string_parameters
-    # json_payload = app.current_event.json_body
-    return {"message": f"hello {name}"}
+@tracer.capture_method
+def hello_name(name):
+    tracer.put_annotation(key="User", value=name)
+    logger.info(f"Request from {name} received")
+    metrics.add_metric(name="SuccessfulGreetings", unit=MetricUnit.Count, value=1)
+    return {"message": f"hello {name}!"}
 
-@metrics.log_metrics(capture_cold_start_metric=True)
-@logger.inject_lambda_context(correlation_id_path=correlation_paths.API_GATEWAY_REST)
+
+@app.get("/hello")
+@tracer.capture_method
+def hello():
+    tracer.put_annotation(key="User", value="unknown")
+    logger.info("Request from unknown received")
+    metrics.add_metric(name="SuccessfulGreetings", unit=MetricUnit.Count, value=1)
+    return {"message": "hello unknown!"}
+
+
 @tracer.capture_lambda_handler
-def lambda_handler(event, context: LambdaContext):
+@logger.inject_lambda_context(
+    correlation_id_path=correlation_paths.API_GATEWAY_REST, log_event=True
+)
+@metrics.log_metrics(capture_cold_start_metric=True)
+def lambda_handler(event, context):
     try:
         return app.resolve(event, context)
     except Exception as e:
