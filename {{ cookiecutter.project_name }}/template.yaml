@@ -17,7 +17,7 @@ Globals: # https://docs.aws.amazon.com/serverless-application-model/latest/devel
     Function:
         Timeout: 5
         MemorySize: 256
-        Runtime: python3.8
+        Runtime: python3.9
         Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
 {%- if cookiecutter.include_safe_deployment == "y" %}
         AutoPublishAlias: live # More info about Safe Deployments: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-deploymentpreference.html
@@ -26,7 +26,7 @@ Globals: # https://docs.aws.amazon.com/serverless-application-model/latest/devel
         # Embed Lambda Powertools as a shared Layer
         # See: https://awslabs.github.io/aws-lambda-powertools-python/latest/#lambda-layer
         Layers: # 
-            - !Sub arn:aws:lambda:${AWS::Region}:017000801446:layer:AWSLambdaPowertoolsPython:6
+            - !Sub arn:aws:lambda:${AWS::Region}:017000801446:layer:AWSLambdaPowertoolsPython:7
         Environment:
             Variables:
                 # Powertools env vars: https://awslabs.github.io/aws-lambda-powertools-python/#environment-variables
