@@ -1,5 +1,15 @@
 # Cookiecutter SAM for Python Lambda functions
 
+## Archived
+
+This project is now archived. Please use the official AWS SAM CLI template instead.
+
+```bash
+sam init --app-template hello-world-powertools-python --name sam-app --package-type Zip --runtime python3.12 --no-tracing
+```
+
+---
+
 This is a [Cookiecutter](https://github.com/audreyr/cookiecutter) template to create a Serverless App based on Serverless Application Model (SAM) and Python 3.9.
 
 It is important to note that you should not try to `git clone` this project but use `SAM` CLI instead as ``{{cookiecutter.project_slug}}`` will be rendered based on your input and therefore all variables and files will be rendered properly.
